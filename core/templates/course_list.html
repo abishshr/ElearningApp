@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Courses - My Django App{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Modern Heading with Icon and Enhanced Styling -->
+    <div class="jumbotron text-center p-4 mb-4 bg-info text-white rounded">
+        <h1 class="display-4"><i class="fas fa-book-open"></i> Available Courses</h1>
+        <p class="lead">Browse through the courses and start your learning journey today!</p>
+    </div>
+
+    <!-- List of Available Courses -->
+    <ul class="list-group">
+        {% for course in courses %}
+            <li class="list-group-item d-flex align-items-center">
+                <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
+                <a href="{% url 'course_detail' course.id %}" class="text-decoration-none">
+                    {{ course.title }}
+                </a>
+            </li>
+        {% empty %}
+            <li class="list-group-item">No courses available at the moment.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

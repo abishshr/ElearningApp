@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - My Django App{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Updated Heading with Modern Styling -->
+    <div class="jumbotron text-center p-4 mb-4 bg-primary text-white rounded">
+        <h1 class="display-4"><i class="fas fa-user"></i> Welcome, {{ user.username }}!</h1>
+        <p class="lead">Explore courses, chat with peers, and share your updates with the community!</p>
+    </div>
+
+    <!-- Teacher-Specific Actions -->
+    {% if user.is_teacher %}
+        <p>
+            <a href="{% url 'create_course' %}" class="btn btn-primary mb-3"><i class="fas fa-chalkboard-teacher"></i> Create a New Course</a>
+        </p>
+
+        <!-- Student Search Form for Teachers -->
+        <h3><i class="fas fa-search"></i> Search for Students:</h3>
+        <form method="GET" action="{% url 'search_users' %}" class="mb-4">
+            <div class="mb-3">
+                <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Enter student name or username">
+            </div>
+            <button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
+        </form>
+
+    {% endif %}
+
+    <!-- Teacher Actions: Display Courses Created by the Teacher -->
+    {% if user.is_teacher %}
+        <h3 class="mt-4"><i class="fas fa-book"></i> Courses You Created:</h3>
+        <ul class="list-group mb-4">
+            {% for course in created_courses %}
+                {% if course.id %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{% url 'course_detail' course.id %}">{{ course.title }}</a>
+                        <span>
+                            <a href="{% url 'edit_course' course.id %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>
+                            <form action="{% url 'delete_course' course.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this course?');">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        </span>
+                    </li>
+                {% else %}
+                    <li class="list-group-item">Invalid course data; cannot display course.</li>
+                {% endif %}
+            {% empty %}
+                <li class="list-group-item">You have not created any courses yet.</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Student-Specific Actions -->
+    {% if not user.is_teacher %}
+        <p>
+            <a href="{% url 'course_list' %}" class="btn btn-secondary mb-3"><i class="fas fa-book"></i> Browse Available Courses</a>
+        </p>
+    {% endif %}
+
+    <!-- Your Courses Section -->
+    <h3 class="mt-4"><i class="fas fa-graduation-cap"></i> Your Enrolled Courses:</h3>
+    <ul class="list-group mb-4">
+        {% for enrollment in courses %}
+            {% if enrollment.course.id %}
+                <li class="list-group-item">
+                    <a href="{% url 'course_detail' enrollment.course.id %}">{{ enrollment.course.title }}</a>
+                </li>
+            {% else %}
+                <li class="list-group-item">Invalid enrollment data; cannot display course.</li>
+            {% endif %}
+        {% empty %}
+            <li class="list-group-item">No courses enrolled yet.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Status Update Form -->
+    <h3><i class="fas fa-edit"></i> Post a Status Update:</h3>
+    <form method="post" action="{% url 'home' %}" class="mb-4">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <textarea name="content" class="form-control" placeholder="What's on your mind?" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane"></i> Post</button>
+    </form>
+
+    <!-- Display Status Updates -->
+    <h3><i class="fas fa-list"></i> Status Updates:</h3>
+    <ul class="list-group">
+        {% for update in status_updates %}
+            <li class="list-group-item">{{ update.content }} - <small>{{ update.timestamp|date:"F j, Y, g:i a" }}</small></li>
+        {% empty %}
+            <li class="list-group-item">No status updates yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

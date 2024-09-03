@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Confirm Delete Course</h2>
+  
+  <p>Are you sure you want to delete the course: <strong>{{ course.title }}</strong>?</p>
+  
+  <!-- Display any error messages -->
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <!-- Form to confirm course deletion -->
+  <form method="post" action="{% url 'delete_course' course.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="{% url 'course_detail' course.id %}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}

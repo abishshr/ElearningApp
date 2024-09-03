@@ -1,0 +1,182 @@
+/* styles.css */
+
+/* General Body Styles */
+body {
+    background-color: #f8f9fa; /* Light gray background */
+    font-family: 'Arial', sans-serif;
+    color: #343a40; /* Dark text color */
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styles */
+nav {
+    background-color: #007bff; /* Bootstrap Primary Color */
+    padding: 10px 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between; /* Align items horizontally */
+    align-items: center;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 15px;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+nav ul li a:hover {
+    background-color: #0056b3; /* Darker shade of the primary color */
+    color: #ffffff;
+}
+
+/* Updated Logout Button Styles */
+nav ul li form button {
+    background-color: #dc3545; /* Bootstrap Danger Color for Logout */
+    color: #ffffff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex; /* Changed from flex to inline-flex for better alignment with text */
+    align-items: center;
+    justify-content: center; /* Center text and icon within the button */
+    transition: background-color 0.3s, transform 0.2s; /* Add a smooth hover effect */
+}
+
+nav ul li form button:hover {
+    background-color: #c82333; /* Darker shade of the danger color */
+    transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+
+/* Button Styles */
+button {
+    background-color: #007bff; /* Bootstrap Primary Color */
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    display: inline-block; /* Ensure proper alignment */
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker shade of the primary color */
+}
+
+/* Chat Icon Styles */
+.chat-icon {
+    margin-right: 8px;
+}
+
+/* Form Styling */
+form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+form .form-check {
+    margin-bottom: 1rem;
+}
+
+.form-check-label {
+    margin-left: 0.5rem;
+}
+
+.invalid-feedback {
+    color: #e3342f; /* Bootstrap danger color */
+    font-size: 0.875rem;
+}
+
+textarea, input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+/* Chat Log Box */
+#chat-log {
+    background-color: #ffffff;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    height: 300px;
+    overflow-y: scroll;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+/* Chat Input Group */
+#chat-input-group {
+    display: flex;
+    align-items: center;
+}
+
+#chat-message-input {
+    flex: 1; /* Allow input to take available width */
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+#chat-message-submit {
+    margin-left: 10px; /* Add some space between input and button */
+    padding: 10px 20px;
+}
+
+/* Footer and other sections */
+footer {
+    background-color: #343a40;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav ul li {
+        margin: 10px 0;
+    }
+
+    #chat-input-group {
+        flex-direction: column;
+    }
+
+    #chat-message-input,
+    #chat-message-submit {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

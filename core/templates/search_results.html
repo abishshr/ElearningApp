@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - My Django App{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-search"></i> Search Results for "{{ request.GET.q }}"</h2>
+    <hr>
+
+    <!-- Display Search Results -->
+    {% if students %}
+        <ul class="list-group mb-4">
+            {% for student in students %}
+                <li class="list-group-item">
+                    <strong>{{ student.username }}</strong> - {{ student.first_name }} {{ student.last_name }}
+                    <p>Email: {{ student.email }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No students found matching your search criteria.</p>
+    {% endif %}
+
+    <!-- Back to Home Button -->
+    <a href="{% url 'home' %}" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left"></i> Back to Home</a>
+</div>
+{% endblock %}

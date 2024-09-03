@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Register - My Django App{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Register</h2>
+    <form method="post" class="mt-3">
+        {% csrf_token %}
+
+        <!-- Username Field -->
+        <div class="form-group mb-3">
+            {{ form.username.label_tag }}
+            {{ form.username|add_class:"form-control" }}
+            {% if form.username.errors %}
+                <div class="invalid-feedback d-block">{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group mb-3">
+            {{ form.email.label_tag }}
+            {{ form.email|add_class:"form-control" }}
+            {% if form.email.errors %}
+                <div class="invalid-feedback d-block">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Is Student Checkbox -->
+        <div class="form-check mb-3">
+            {{ form.is_student|add_class:"form-check-input" }}
+            {{ form.is_student.label_tag|add_class:"form-check-label" }}
+        </div>
+
+        <!-- Is Teacher Checkbox -->
+        <div class="form-check mb-3">
+            {{ form.is_teacher|add_class:"form-check-input" }}
+            {{ form.is_teacher.label_tag|add_class:"form-check-label" }}
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group mb-3">
+            {{ form.password1.label_tag }}
+            {{ form.password1|add_class:"form-control" }}
+            {% if form.password1.errors %}
+                <div class="invalid-feedback d-block">{{ form.password1.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="form-group mb-3">
+            {{ form.password2.label_tag }}
+            {{ form.password2|add_class:"form-control" }}
+            {% if form.password2.errors %}
+                <div class="invalid-feedback d-block">{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Password-Based Authentication Section -->
+        <div class="form-group mb-3">
+            <label>Password-based Authentication:</label>
+            <div class="form-check">
+                <input type="radio" id="enabled" name="authentication" value="enabled" class="form-check-input">
+                <label for="enabled" class="form-check-label">Enabled</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" id="disabled" name="authentication" value="disabled" class="form-check-input">
+                <label for="disabled" class="form-check-label">Disabled</label>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary btn-block mt-3">Register</button>
+    </form>
+</div>
+{% endblock %}

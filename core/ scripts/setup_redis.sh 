@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# This script installs and starts the Redis server
+
+# Update package list and install Redis
+echo "Updating package list..."
+sudo apt-get update
+
+echo "Installing Redis server..."
+sudo apt-get install -y redis-server
+
+# Modify the Redis configuration file to allow connections from any IP (optional)
+echo "Configuring Redis to accept connections from any IP..."
+sudo sed -i "s/^#\?bind 127\.0\.0\.1 ::1/bind 0.0.0.0/g" /etc/redis/redis.conf
+
+# Enable Redis to start on boot
+echo "Enabling Redis to start on boot..."
+sudo systemctl enable redis-server
+
+# Restart Redis to apply any changes
+echo "Restarting Redis server..."
+sudo systemctl restart redis-server
+
+# Confirm that Redis is running
+echo "Checking Redis server status..."
+sudo systemctl status redis-server --no-pager
+
+echo "Redis setup complete."

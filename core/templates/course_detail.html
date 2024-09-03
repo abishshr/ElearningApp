@@ -1,0 +1,122 @@
+<!-- course_detail.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - Course Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Course Title and Description -->
+    <h1>{{ course.title }}</h1>
+    <p>{{ course.description }}</p>
+
+    <!-- Materials Section -->
+    <h3>Course Materials</h3>
+    {% if materials %}
+        <ul class="list-group mb-4">
+            {% for material in materials %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ material.title }}</strong>: {{ material.description }}
+                        {% if material.file %}
+                            - <a href="{{ material.file.url }}" target="_blank">Download</a>
+                        {% endif %}
+                        <small class="text-muted">{{ material.created_at|date:"F j, Y, g:i a" }}</small>
+                    </div>
+                    {% if user.is_teacher and user == course.teacher %}
+                        <div>
+                            <a href="{% url 'edit_material' course.id material.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No materials available yet for this course.</p>
+    {% endif %}
+
+    <!-- Add Material Button for Teachers -->
+    {% if user.is_teacher and user == course.teacher %}
+        <a href="{% url 'add_material' course.id %}" class="btn btn-primary mb-4">Add New Material</a>
+    {% endif %}
+
+    <!-- Enrollment Section -->
+    {% if is_student %}
+        {% if not is_enrolled %}
+            <!-- Enroll Button -->
+            <form method="post" action="{% url 'course_detail' course.id %}">
+                {% csrf_token %}
+                <button type="submit" name="enroll" class="btn btn-success mb-4">Enroll in this Course</button>
+            </form>
+        {% else %}
+            <p class="text-success"><strong>You are enrolled in this course.</strong></p>
+            <!-- Unenroll Button -->
+            <form method="post" action="{% url 'course_detail' course.id %}">
+                {% csrf_token %}
+                <button type="submit" name="unenroll" class="btn btn-warning mb-4">Unenroll</button>
+            </form>
+        {% endif %}
+    {% endif %}
+
+    <!-- List of Enrolled Students for Teachers -->
+    {% if user.is_teacher and user == course.teacher %}
+        <h3>Enrolled Students</h3>
+        <ul class="list-group mb-4">
+            {% for enrollment in course.enrollments.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ enrollment.student.username }}
+                        {% if enrollment.blocked %}
+                            <span class="badge bg-danger">Blocked</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if not enrollment.blocked %}
+                            <form method="post" action="{% url 'remove_student' course.id enrollment.student.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                            </form>
+                            <form method="post" action="{% url 'block_student' course.id enrollment.student.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-warning">Block</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'unblock_student' course.id enrollment.student.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success">Unblock</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Feedback Section -->
+    <h3>Feedback</h3>
+    {% if feedbacks %}
+        <ul class="list-group mb-4">
+            {% for feedback in feedbacks %}
+                <li class="list-group-item">
+                    {{ feedback.content }} - <small>by {{ feedback.student.username }} on {{ feedback.created_at|date:"F j, Y, g:i a" }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No feedback available yet for this course.</p>
+    {% endif %}
+
+    <!-- Feedback Form -->
+    {% if feedback_form %}
+        <h3>Leave Feedback</h3>
+        <form method="post" action="{% url 'course_detail' course.id %}">
+            {% csrf_token %}
+            {{ feedback_form.as_p }}
+            <button type="submit" name="submit_feedback" class="btn btn-primary">Submit Feedback</button>
+        </form>
+    {% endif %}
+
+    <!-- Back to Course List Button -->
+    <a href="{% url 'course_list' %}" class="btn btn-secondary mt-3">Back to Course List</a>
+</div>
+{% endblock %}

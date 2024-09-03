@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat Rooms - My Django App{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Modern Header Styling with Icon -->
+    <div class="jumbotron text-center p-4 mb-4 bg-warning text-dark rounded">
+        <h1 class="display-4"><i class="fas fa-comments"></i> Chat Rooms</h1>
+        <p class="lead">Join an existing chat room or create a new one to discuss with peers and instructors.</p>
+    </div>
+
+    <!-- List of Default Chat Rooms -->
+    <h3 class="mt-4"><i class="fas fa-door-open"></i> Default Chat Rooms:</h3>
+    <ul class="list-group mb-4">
+        {% for room in default_rooms %}
+            <li class="list-group-item d-flex align-items-center">
+                <i class="fas fa-comments text-primary me-2"></i>
+                <a href="{% url 'room' room_name=room.name %}" class="text-decoration-none">{{ room.name|title }} Chat Room</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- List of Recently Created Chat Rooms -->
+    <h3 class="mt-4"><i class="fas fa-plus-circle"></i> Recently Created Chat Rooms:</h3>
+    <ul class="list-group mb-4">
+        {% for room in recent_rooms %}
+            <li class="list-group-item d-flex align-items-center">
+                <i class="fas fa-comments text-info me-2"></i>
+                <a href="{% url 'room' room_name=room.name %}" class="text-decoration-none">{{ room.name|title }}</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item">No recent rooms available.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Option to Create or Join a New Chat Room -->
+    <h3 class="mt-4"><i class="fas fa-plus-circle"></i> Create or Join a New Chat Room:</h3>
+    <form method="POST" action="{% url 'create_room' %}" class="mb-4">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <input type="text" name="room_name" class="form-control" placeholder="Enter Room Name" required>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create/Join Room
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
