@@ -1,1 +1,2 @@
-web: gunicorn elearning_project.wsgi --log-file -
+web: daphne -u /tmp/daphne.sock elearning_project.asgi:application
+worker: python manage.py runworker
