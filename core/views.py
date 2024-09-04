@@ -11,10 +11,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 # Import forms, models, and serializers
-from .forms import CourseForm, CustomUserCreationForm, FeedbackForm, UserProfileForm, MaterialForm
+from .forms import CourseForm, CustomUserCreationForm, FeedbackForm, UserProfileForm, MaterialForm, StatusUpdateForm
 from .models import Course, Enrollment, StatusUpdate, CustomUser, Feedback, ChatRoom, Material, Notification
 from .serializers import CustomUserSerializer, CourseSerializer, EnrollmentSerializer, FeedbackSerializer, StatusUpdateSerializer
 from .utils import notify_teacher_on_enrollment, notify_student_on_new_material, notify_all_students
+
+import logging
+
+# Create a logger instance
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------
 # Helper Functions
@@ -90,24 +95,29 @@ class HomeView(LoginRequiredMixin, APIView):
                     last_name__icontains=query
                 )
 
+        # Fetch unread notifications
+        notification_count = request.user.notifications.filter(read=False).count()
+        unread_notifications = request.user.notifications.filter(read=False)
+
         return render(request, 'home.html', {
             'courses': user_courses,
             'status_updates': status_updates,
             'created_courses': created_courses,
             'students': students,
+            'notification_count': notification_count,
+            'unread_notifications': unread_notifications,
         })
-
     def post(self, request):
-        """
-        Handles posting of a status update by the user.
-        """
-        content = request.POST.get('content')
-        if content:
-            StatusUpdate.objects.create(user=request.user, content=content)
-            messages.success(request, "Your status has been posted.")
-        else:
-            messages.error(request, "Status content cannot be empty.")
-        return redirect('home')
+        # Handle posting a status update
+        status_update_form = StatusUpdateForm(request.POST)
+        if status_update_form.is_valid():
+            status_update = status_update_form.save(commit=False)
+            status_update.user = request.user
+            status_update.save()
+            return redirect('home')  # Redirect to home after posting a status update
+
+        # If form is invalid, render the home page with the existing form data
+        return self.get(request)
 
 # ---------------------------------------------------------
 # API Views using Django REST Framework
@@ -223,6 +233,9 @@ def course_detail(request, course_id):
     is_enrolled = Enrollment.objects.filter(student=request.user, course=course).exists()
     feedback_form = FeedbackForm() if is_enrolled else None  # Show feedback form only if enrolled
 
+    # Fetch unread notifications for this user
+    user_notifications = Notification.objects.filter(user=request.user, read=False)
+
     if request.method == 'POST':
         if is_student:
             if 'submit_feedback' in request.POST and is_enrolled:
@@ -246,14 +259,17 @@ def course_detail(request, course_id):
 
         return redirect('course_detail', course_id=course.id)
 
-    return render(request, 'course_detail.html', {
+    context = {
         'course': course,
-        'feedback_form': feedback_form,
         'feedbacks': feedbacks,
-        'materials': materials,  # Include materials in context
-        'is_enrolled': is_enrolled,
+        'materials': materials,
         'is_student': is_student,
-    })
+        'is_enrolled': is_enrolled,
+        'feedback_form': feedback_form,
+        'user_notifications': user_notifications,  # Pass notifications to the context
+    }
+    return render(request, 'course_detail.html', context)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -516,13 +532,22 @@ def edit_material(request, course_id, material_id):
 
     return render(request, 'edit_material.html', {'form': form, 'course': course, 'material': material})
 
+
 @login_required
 def notifications(request):
     """
     Displays notifications for the logged-in user.
     """
+    # Log the request to view notifications
+    logger.debug(f"User {request.user.username} requested to view notifications.")
+
     user_notifications = Notification.objects.filter(user=request.user, read=False)
+
+    # Log the count of notifications retrieved
+    logger.debug(f"Retrieved {len(user_notifications)} unread notifications for user {request.user.username}")
+
     return render(request, 'notifications.html', {'notifications': user_notifications})
+
 
 @api_view(['POST'])
 @login_required
@@ -530,10 +555,18 @@ def mark_notification_read(request, notification_id):
     """
     Marks a notification as read.
     """
+    # Log the request to mark a notification as read
+    logger.debug(f"User {request.user.username} requested to mark notification {notification_id} as read.")
+
     notification = get_object_or_404(Notification, id=notification_id, user=request.user)
     notification.read = True
     notification.save()
+
+    # Log the successful marking of the notification as read
+    logger.debug(f"Notification {notification_id} marked as read for user {request.user.username}")
+
     return redirect('notifications')
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

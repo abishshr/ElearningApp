@@ -1,10 +1,11 @@
 from django.test import TestCase, Client, TransactionTestCase
 from django.urls import reverse
 from channels.testing import WebsocketCommunicator
-from .models import CustomUser, Course, Enrollment
+from .models import CustomUser, Course, Enrollment, Notification
 from .consumers import EchoConsumer
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.urls import re_path
+from django.contrib.auth import get_user_model
 
 
 class WebSocketTests(TransactionTestCase):
@@ -105,3 +106,19 @@ class CourseTests(TestCase):
 
         # Verify that the enrollment was created
         self.assertTrue(Enrollment.objects.filter(student=student, course=course).exists())
+
+
+
+class NotificationTestCase(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='testuser', password='password')
+        Notification.objects.create(user=self.user, content="New course available.")
+
+    def test_notification_creation(self):
+        self.assertEqual(Notification.objects.count(), 1)
+        self.assertEqual(Notification.objects.first().content, "New course available.")
+
+    def test_notification_retrieval(self):
+        response = self.client.login(username='testuser', password='password')
+        response = self.client.get('/notifications/')
+        self.assertContains(response, "New course available.")

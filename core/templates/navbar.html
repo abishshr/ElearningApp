@@ -31,16 +31,14 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-bell"></i> Notifications
-                            {% with user.notifications.unread.count as notification_count %}
-                                {% if notification_count > 0 %}
-                                    <span class="badge bg-danger">{{ notification_count }}</span>
-                                {% endif %}
-                            {% endwith %}
+                            {% if notification_count > 0 %}
+                                <span class="badge bg-danger">{{ notification_count }}</span>
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                            {% for notification in user.notifications.unread.all %}
+                            {% for notification in unread_notifications %}
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'notifications' %}">{{ notification.content }}</a>
+                                    <a class="dropdown-item" href="{% url 'mark_notification_read' notification.id %}">{{ notification.content }}</a>
                                 </li>
                             {% empty %}
                                 <li><a class="dropdown-item" href="#">No new notifications</a></li>

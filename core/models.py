@@ -130,6 +130,9 @@ class ChatMessage(models.Model):
 
 
 # Notification Model
+from django.db import models
+from django.conf import settings
+
 class Notification(models.Model):
     """
     Represents a notification for a user.
@@ -141,9 +144,9 @@ class Notification(models.Model):
         null=True,
         blank=True
     )
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    read = models.BooleanField(default=False)
+    content = models.TextField()  # The main content of the notification
+    created_at = models.DateTimeField(auto_now_add=True)  # Timestamp of when the notification was created
+    read = models.BooleanField(default=False)  # Status to track if the notification has been read
 
     class Meta:
         ordering = ['-created_at']  # Orders notifications by most recent first
@@ -156,17 +159,11 @@ class Notification(models.Model):
 
     def mark_as_read(self):
         """
-        Marks the notification as read.
+        Marks this notification as read.
         """
         self.read = True
-        self.save(update_fields=['read'])
+        self.save()
 
-    def mark_as_unread(self):
-        """
-        Marks the notification as unread.
-        """
-        self.read = False
-        self.save(update_fields=['read'])
 
 
 # Material Model

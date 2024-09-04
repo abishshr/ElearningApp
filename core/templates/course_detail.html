@@ -1,5 +1,3 @@
-<!-- course_detail.html -->
-
 {% extends 'base.html' %}
 
 {% block title %}{{ course.title }} - Course Detail{% endblock %}
@@ -61,35 +59,39 @@
     <!-- List of Enrolled Students for Teachers -->
     {% if user.is_teacher and user == course.teacher %}
         <h3>Enrolled Students</h3>
-        <ul class="list-group mb-4">
-            {% for enrollment in course.enrollments.all %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        {{ enrollment.student.username }}
-                        {% if enrollment.blocked %}
-                            <span class="badge bg-danger">Blocked</span>
-                        {% endif %}
-                    </div>
-                    <div>
-                        {% if not enrollment.blocked %}
-                            <form method="post" action="{% url 'remove_student' course.id enrollment.student.id %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
-                            </form>
-                            <form method="post" action="{% url 'block_student' course.id enrollment.student.id %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-warning">Block</button>
-                            </form>
-                        {% else %}
-                            <form method="post" action="{% url 'unblock_student' course.id enrollment.student.id %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-success">Unblock</button>
-                            </form>
-                        {% endif %}
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+        {% if course.enrollments.exists %}
+            <ul class="list-group mb-4">
+                {% for enrollment in course.enrollments.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            {{ enrollment.student.username }}
+                            {% if enrollment.blocked %}
+                                <span class="badge bg-danger">Blocked</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if not enrollment.blocked %}
+                                <form method="post" action="{% url 'remove_student' course.id enrollment.student.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                </form>
+                                <form method="post" action="{% url 'block_student' course.id enrollment.student.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-warning">Block</button>
+                                </form>
+                            {% else %}
+                                <form method="post" action="{% url 'unblock_student' course.id enrollment.student.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success">Unblock</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No students enrolled in this course yet.</p>
+        {% endif %}
     {% endif %}
 
     <!-- Feedback Section -->

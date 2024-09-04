@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser, Course, Feedback, Material
+from .models import CustomUser, Course, Feedback, Material, StatusUpdate
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -101,3 +101,13 @@ class MaterialForm(forms.ModelForm):
     class Meta:
         model = Material
         fields = ['title', 'description', 'file']
+class StatusUpdateForm(forms.ModelForm):
+    class Meta:
+        model = StatusUpdate
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+        labels = {
+            'content': 'What’s on your mind?',
+        }
